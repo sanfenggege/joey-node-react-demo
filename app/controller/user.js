@@ -90,7 +90,7 @@ class UserController extends Controller {
     };
   }
 
-  // 验证方法
+  // 验证token
   async test() {
     const { ctx, app } = this;
     // 通过 token 解析，拿到 user_id
@@ -113,6 +113,58 @@ class UserController extends Controller {
         message: '获取失败',
         data: null,
       };
+    }
+  }
+
+  async getUserInfo() {
+    const { ctx, app } = this;
+    const token = ctx.request.header.authorization;
+    const decode = await app.jwt.verify(token, app.config.jwt.secret);
+    const userInfo = await ctx.service.user.getUserByName(decode.username);
+    console.log('user info data: ', userInfo);
+    const defualtAvater = 'http://s.yezgea02.com/1615973940679/WeChat77d6d2ac093e247c361f0b8a7aeb6c2a.png';
+
+    ctx.body = {
+      code: 200,
+      msg: '获取用户信息成功',
+      data: {
+        id: userInfo.id,
+        username: userInfo.username,
+        signature: userInfo.signature || '',
+        avatar: userInfo.avatar || defualtAvater,
+      },
+    };
+  }
+
+  async editUserInfo() {
+    const { ctx, app } = this;
+    const { signature = '' } = ctx.request.body;
+    try {
+      let user_id;
+      const token = ctx.request.header.authorization;
+      const decode = await app.jwt.verify(token, app.config.jwt.secret);
+      if (!decode) return;
+      user_id = decode.id;
+      const userInfo = await ctx.service.user.getUserByName(decode.username);
+      const result = await ctx.service.user.editUserInfo({ ...userInfo, signature });
+      console.log('edit user info: ', result); // undefined, because editUserInfo edit success not return the result
+      ctx.body = {
+        code: 200,
+        msg: '修改信息成功',
+        data: {
+          id: user_id,
+          username: userInfo.username,
+          signature,
+        },
+      };
+    } catch (error) {
+      console.log('edit user info failed: ', error);
+      ctx.body = {
+        code: 500,
+        msg: '修改信息失败',
+        data: null,
+      };
+      return;
     }
   }
 }
