@@ -16,7 +16,7 @@ module.exports = appInfo => {
       enable: false,
       ignoreJSON: true,
     },
-    domainWhiteList: [ '*', 'http://127.0.0.1:7001' ],
+    domainWhiteList: ['*', 'http://127.0.0.1:7001'],
   };
 
   // use for cookie sign key, should change to your own and keep security
@@ -46,12 +46,16 @@ module.exports = appInfo => {
       // 密码
       // password: '', // 初始化密码，没设置的可以不写
       // 数据库名
-      database: 'test', // 我们新建的数据库名称
+      database: 'juejue-cost', // 我们新建的数据库名称
     },
     // 是否加载到 app 上，默认开启
     app: true,
     // 是否加载到 agent 上，默认关闭
     agent: false,
+  };
+
+  config.jwt = {
+    secret: 'JoeyZhang',
   };
 
   return {
