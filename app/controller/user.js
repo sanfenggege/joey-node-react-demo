@@ -138,7 +138,7 @@ class UserController extends Controller {
 
   async editUserInfo() {
     const { ctx, app } = this;
-    const { signature = '' } = ctx.request.body;
+    const { signature = '', avatar = '' } = ctx.request.body;
     try {
       let user_id;
       const token = ctx.request.header.authorization;
@@ -146,7 +146,7 @@ class UserController extends Controller {
       if (!decode) return;
       user_id = decode.id;
       const userInfo = await ctx.service.user.getUserByName(decode.username);
-      const result = await ctx.service.user.editUserInfo({ ...userInfo, signature });
+      const result = await ctx.service.user.editUserInfo({ ...userInfo, signature, avatar });
       console.log('edit user info: ', result); // undefined, because editUserInfo edit success not return the result
       ctx.body = {
         code: 200,
@@ -155,6 +155,7 @@ class UserController extends Controller {
           id: user_id,
           username: userInfo.username,
           signature,
+          avatar,
         },
       };
     } catch (error) {
