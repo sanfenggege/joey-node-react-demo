@@ -21,4 +21,7 @@ module.exports = app => {
   router.get('/api/bill/get_bill_detail', _jwt, controller.bill.billDetail);
   router.post('/api/bill/update_bill_detail', _jwt, controller.bill.updateBill);
   router.post('/api/bill/delete_bill', _jwt, controller.bill.deleteBill);
+
+  // bill graph data:
+  router.get('/api/bill/get_bill_graph', _jwt, controller.bill.billGraphData);
 };

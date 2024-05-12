@@ -249,6 +249,92 @@ class BillController extends Controller {
       return;
     }
   }
+
+  async billGraphData() {
+    const { app, ctx } = this;
+    const { date = '' } = ctx.query;
+    console.log('date: ', date);
+    try {
+      const token = ctx.request.header.authorization;
+      const decode = await app.jwt.verify(token, app.config.jwt.secret);
+      if (!decode) return;
+      console.log('decode: ', decode);
+      const user_id = decode.id;
+      const billList = await ctx.service.bill.billList(user_id);
+      console.log('get billList data from database: ', billList);
+
+      const start = moment(date).startOf('month').unix() * 1000; // 选择月份，月初时间
+      const end = moment(date).endOf('month').unix() * 1000; // 选择月份，月末时间
+      console.log('start&end: ', start, end);
+
+      const monthBillList = billList.filter(bill => {
+        console.log('billList.filter: ', bill);
+        console.log('Number(bill.date): ', Number(bill.date));
+        console.log('pare start VS end: ', Number(bill.date) > start && Number(bill.date) < end);
+        return Number(bill.date) > start && Number(bill.date) < end;
+      });
+      console.log('monthBillList: ', monthBillList);
+
+      // pay_type:1-支出；2-收入
+      const totalMonthExpense = monthBillList.reduce((arr, cur) => {
+        if (cur.pay_type === 1) {
+          arr += Number(cur.amount);
+        }
+        return arr;
+      }, 0);
+      console.log('totalMonthExpense: ', totalMonthExpense);
+
+      const totalMonthIncome = monthBillList.reduce((arr, cur) => {
+        if (cur.pay_type === 2) {
+          arr += Number(cur.amount);
+        }
+        return arr;
+      }, 0);
+      console.log('totalMonthIncome: ', totalMonthIncome);
+
+      let totalMonthData = monthBillList.reduce((arr, cur) => {
+        const index = arr.findIndex(item => item.type_id === cur.type_id);
+        if (index === -1) {
+          arr.push({
+            type_id: cur.type_id,
+            type_name: cur.type_name,
+            pay_type: cur.pay_type,
+            number: Number(cur.amount),
+          });
+        }
+
+        if (index > -1) {
+          arr[index].number += Number(cur.amount);
+        }
+        return arr;
+      }, []);
+      console.log('totalMonthData: ', totalMonthData);
+
+      totalMonthData = totalMonthData.map(item => {
+        item.number = Number(Number(item.number).toFixed(2));
+        return item;
+      });
+
+      ctx.body = {
+        code: 200,
+        msg: '请求bill graph data 成功',
+        data: {
+          total_expense: Number(totalMonthExpense).toFixed(2),
+          total_income: Number(totalMonthIncome).toFixed(2),
+          total_data: totalMonthData || [],
+        },
+      };
+      console.log('get bill graph data success: ', ctx.body);
+    } catch (error) {
+      console.log('get bill graph failed: ', error);
+      ctx.body = {
+        code: 500,
+        msg: '系统错误',
+        data: null,
+      };
+      return;
+    }
+  }
 }
 
 module.exports = BillController;
