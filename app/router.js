@@ -15,6 +15,9 @@ module.exports = app => {
   // upload file(avatar):
   router.post('/api/upload', controller.upload.upload);
 
+  // type:
+  router.get('/api/type/get_type_list', _jwt, controller.type.typeList);
+
   // bill:
   router.post('/api/bill/add_bill', _jwt, controller.bill.addBill);
   router.get('/api/bill/get_bill_list', _jwt, controller.bill.billList);
