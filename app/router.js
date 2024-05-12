@@ -2,11 +2,29 @@
  * @param {Egg.Application} app - egg application
  */
 module.exports = app => {
-  const { router, controller } = app;
-  router.get('/', controller.home.index);
-  router.post('/add', controller.home.add);
-  router.get('/user', controller.home.user);
-  router.post('/add_user', controller.home.addUser); // 该API并不符合Restful API 命名规则： https://restful.p2hp.com/home/resource-naming
-  router.post('/edit_user', controller.home.editUser);
-  router.post('/delete_user', controller.home.deleteUser);
+  const { router, controller, middleware } = app;
+  const _jwt = middleware.jwtErr(app.config.jwt.secret);
+  router.get('/api/user/test', _jwt, controller.user.test);
+
+  // user:
+  router.post('/api/user/register', controller.user.register);
+  router.post('/api/user/login', controller.user.login);
+  router.get('/api/user/get_userinfo', _jwt, controller.user.getUserInfo);
+  router.post('/api/user/edit_userinfo', _jwt, controller.user.editUserInfo);
+
+  // upload file(avatar):
+  router.post('/api/upload', controller.upload.upload);
+
+  // type:
+  router.get('/api/type/get_type_list', _jwt, controller.type.typeList);
+
+  // bill:
+  router.post('/api/bill/add_bill', _jwt, controller.bill.addBill);
+  router.get('/api/bill/get_bill_list', _jwt, controller.bill.billList);
+  router.get('/api/bill/get_bill_detail', _jwt, controller.bill.billDetail);
+  router.post('/api/bill/update_bill_detail', _jwt, controller.bill.updateBill);
+  router.post('/api/bill/delete_bill', _jwt, controller.bill.deleteBill);
+
+  // bill graph data:
+  router.get('/api/bill/get_bill_graph', _jwt, controller.bill.billGraphData);
 };
