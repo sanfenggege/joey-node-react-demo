@@ -64,7 +64,7 @@ class BillController extends Controller {
 
       const filteredBillList = billList.filter(bill => {
         if (type_id !== 'all') {
-          return moment(Number(bill.date)).format('YYYY-MM') === date && type_id === bill.type_id;
+          return moment(Number(bill.date)).format('YYYY-MM') === date && Number(type_id) === Number(bill.type_id);
         }
         return moment(Number(bill.date)).format('YYYY-MM') === date;
       });
@@ -84,6 +84,7 @@ class BillController extends Controller {
             bills: [ bill ],
           });
         }
+        console.log('filter date: ', curr);
         return curr;
       }, []).sort((left, right) => moment(right.date) - moment(left.date));
 
@@ -93,7 +94,7 @@ class BillController extends Controller {
       console.log('slice according to the page and page_size and get filterListMap: ', filterListMap);
 
       const billMonthList = billList.filter(item => moment(Number(item.date)).format('YYYY-MM') === date);
-      console.log('billMonthList: ', billMonthList);
+      // console.log('billMonthList: ', billMonthList);
 
       const totalMonthExpense = billMonthList.reduce((curr, bill) => {
         if (bill.pay_type === 1) {
@@ -261,7 +262,7 @@ class BillController extends Controller {
       console.log('decode: ', decode);
       const user_id = decode.id;
       const billList = await ctx.service.bill.billList(user_id);
-      console.log('get billList data from database: ', billList);
+      console.log('get billGrap data from database: ', billList);
 
       const start = moment(date).startOf('month').unix() * 1000; // 选择月份，月初时间
       const end = moment(date).endOf('month').unix() * 1000; // 选择月份，月末时间
