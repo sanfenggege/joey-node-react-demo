@@ -36,6 +36,18 @@ class UserService extends Service {
       return null;
     }
   }
+
+  async modifyPass(params) {
+    const { app } = this;
+    try {
+      const result = await app.mysql.update('user', { ...params }, { id: params.id });
+      console.log('modifyPass result: ', result);
+      return result;
+    } catch (error) {
+      console.log('modifyPass error: ', error);
+      return null;
+    }
+  }
 }
 
 module.exports = UserService;
