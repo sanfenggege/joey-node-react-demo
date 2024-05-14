@@ -16,7 +16,7 @@ module.exports = appInfo => {
       enable: false,
       ignoreJSON: true,
     },
-    domainWhiteList: ['*', 'http://127.0.0.1:7001'],
+    domainWhiteList: [ '*', 'http://127.0.0.1:7001' ],
   };
 
   // use for cookie sign key, should change to your own and keep security
